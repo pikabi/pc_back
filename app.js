@@ -1,27 +1,39 @@
+const express = require('express');
+const cors = require('cors');
 const mysql = require('mysql2');
+const bodyParser = require('body-parser');
+const userRoutes = require('./routes/user'); 
+const homeRoutes = require('./routes/home'); 
+const productRoutes = require('./routes/product'); 
+const messageRoutes = require('./routes/message');
+const favouriteRoutes = require('./routes/favourite');
+const scaleRoutes = require('./routes/scale');
 
-// 创建连接
-const connection = mysql.createConnection({
+const db = mysql.createConnection({
   host: 'localhost',
-  user: 'test_user',
-  password: 'password',
-  database: 'test_db'
+  user: 'pikabi',
+  password: '1',
+  database: 'pc',
 });
 
-// 连接数据库
-connection.connect(err => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    return;
-  }
-  console.log('Connected to MySQL database!');
+const app = express();
+const port = 5000;
 
-  // 执行查询
-  connection.query('SELECT 1 + 1 AS result', (err, results) => {
-    if (err) throw err;
-    console.log('Query result:', results);
-  });
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['POST', 'GET'],
+  allowedHeaders: ['Content-Type']
+}));
 
-  // 关闭连接
-  connection.end();
+app.use(bodyParser.json());
+
+app.use('/user', userRoutes); 
+app.use('/home', homeRoutes);
+app.use('/product', productRoutes);
+app.use('/message', messageRoutes);
+app.use('/favourite', favouriteRoutes);
+app.use('/scale', scaleRoutes);
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
