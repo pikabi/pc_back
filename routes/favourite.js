@@ -26,7 +26,6 @@ function checkProductIds(id, productIds, callback) {
     callback(null, checkResults);
   });
 }
-
 function handleRating(result) {
   const minPrice = Math.min.apply(Math, result.map(function(o) { return Number(o.price); }));
   let maxSale = Math.max.apply(Math, result.map(function(o) { return Number(o.total_sales); }));
@@ -35,29 +34,30 @@ function handleRating(result) {
   maxSale = (maxSale === 0 ? 1 : maxSale);
   maxComment = (maxComment === 0 ? 1 : maxComment);
   result.forEach(function(o) {
-    priceRating = 4.0 * minPrice / o.price + Math.min(200 / Number(o.price, 1.0));
+    priceRating = 3.0 * minPrice / Number(o.price) + 2.0 * Math.min(200 / Number(o.price), 1.0);
     if (o.platform === 'jd') {
-      hotRating = 2.5 * Number(o.comment) / maxComment + 2.5 * Number(o.comment) / Math.max(maxSale, maxComment / 10);
+      hotRating = 2 + 1.5 * Number(o.comment) / maxComment + 1.5 * Number(o.comment) / Math.max(maxSale * 250, maxComment);
     }
     else {
-      hotRating = 2.5 * Number(o.total_sales) / maxSale + 2.5 * Number(o.total_sales) / Math.max(maxSale, maxComment / 10);
+      hotRating = 2 + 1.5 * Number(o.total_sales) / maxSale + 1.5 * Number(o.total_sales) / Math.max(maxSale, maxComment / 250);
     }
     discount = Math.min(Number(o.extraPrice) / Number(o.price), 1.0);
     if (discount < 0.5) {
       discountRating = 5.0
     }
     else {
-      discountRating = -4 * discount * discount + 6;
+      discountRating = -2 * discount * discount + 5.5;
     }
     if(Number(o.variety) <= 1) {
       varietyRating = 1;
     }
-    else if(Number(o.variety) >= 64) {
-      varietyRating = 5;
-    }
     else {
-      varietyRating = Math.log2(Number(o.variety)) / maxVariety * 2 + Math.log2(Number(o.variety)) / 3 + 1;
+      varietyRating = Math.log2(Number(o.variety) <= 0? 1: Number(o.variety)) / maxVariety * 2 + Math.min(Math.log2(Number(o.variety) <= 0? 1: Number(o.variety)) / 3, 2) + 1;
     }
+    priceRating = Math.sqrt(priceRating / 5) * 5;
+    hotRating = Math.sqrt(hotRating / 5) * 5;
+    discountRating = Math.sqrt(discountRating / 5) * 5;
+    varietyRating = Math.sqrt(varietyRating / 5) * 5;
     o.ratingAll = Math.round(Math.sqrt((Number(o.shopRating) + priceRating + hotRating + discountRating + varietyRating) / 25) * 500) / 100;
   });
   return result;

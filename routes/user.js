@@ -130,6 +130,7 @@ router.post('/login', (req, res) => {
           phone: user.phone,
           country: user.country,
           address: user.address,
+          unreadMessage: user.unread_messages,
         });
         db.end();
       });
@@ -138,7 +139,7 @@ router.post('/login', (req, res) => {
   else if(!email) {
     db.query(users.queryByUsername, [name], (err, result) => {
       if (err) {
-        return res.status(500).json({ message: '数据异常，请重新登录。' });
+        return res.status(500).json({ message: '数据异常，请重新登录。1' });
       }
       if (result.length === 0) {
         return res.status(401).json({ message: '用户名或密码错误。1' });
@@ -149,7 +150,7 @@ router.post('/login', (req, res) => {
       }
       db.query(users.updateLogintime, [loginTime, user.user_id], (err) => {
         if (err) {
-          return res.status(500).json({ message: '数据异常，请重新登录。' });
+          return res.status(500).json({ message: '数据异常，请重新登录。2' });
         }
         res.status(200).json({ 
           message: '登录成功。',
@@ -159,6 +160,7 @@ router.post('/login', (req, res) => {
           phone: user.phone,
           country: user.country,
           address: user.address,
+          unreadMessage: user.unread_messages,
         });
         db.end();
       });

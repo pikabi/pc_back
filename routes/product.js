@@ -397,4 +397,61 @@ router.get('/detail', (req, res) =>{
   });
 });
 
+router.get('/history', (req, res) => {
+  const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'pikabi',
+    password: '1',
+    database: 'pc',
+  });
+
+  const { id } = req.query;
+  db.query(products.queryPriceSequence, id, (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: '数据异常，请重新操作。' });
+    }
+    const now = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+    const answer = result.filter(row => new Date(row.price_date) >= oneMonthAgo);
+    const temp = result.filter(row => new Date(row.price_date) < oneMonthAgo);
+    answer.reverse();
+    const date = answer.map(row => row.price_date.toISOString().split('T')[0]);
+    const price = answer.map(row => row.price);
+    const parseDate = (dateStr) => new Date(dateStr);
+    const formatDate = (date) => date.toISOString().split('T')[0];
+    const startDate = parseDate(date[0]);
+    const endDate = parseDate(date[date.length - 1]);
+
+    const completeDates = [];
+    const completePrices = [];
+    if (temp.length > 0)
+      for (let d = oneMonthAgo; d < startDate; d.setDate(d.getDate() + 1)) {
+        completeDates.push(formatDate(new Date(d)));
+        completePrices.push(temp[0].price);
+      }
+
+    let priceIndex = 0;
+    for (let d = startDate; d < endDate; d.setDate(d.getDate() + 1)) {
+        completeDates.push(formatDate(new Date(d)));
+        if (priceIndex != date.length - 1 && date[priceIndex+1] <= formatDate(new Date(d))) {
+            priceIndex++;
+        }
+        completePrices.push(price[priceIndex]);
+    }
+    priceIndex = priceIndex+1;
+    for (let d = endDate; d <= now; d.setDate(d.getDate() + 1)) {
+      completeDates.push(formatDate(new Date(d)));
+      completePrices.push(price[priceIndex]);
+    }
+    
+
+    return res.status(200).json({
+      date:completeDates,
+      price:completePrices,
+    });
+  });
+
+});
+
 module.exports = router;

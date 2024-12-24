@@ -467,8 +467,7 @@ def Tosql_price_jd():
                     cursor.execute("UPDATE users SET unread_messages = %s WHERE user_id = %s", (unread_messages, user_id[0]))
                     cursor.execute("SELECT email FROM users WHERE user_id = %s", (user_id[0], ))
                     result = cursor.fetchone()
-                    email = result[0]
-                    send_email_via_api(email, name)
+                    send_email_via_api(email, name) for email in result
 
     connection.commit()
     cursor.close()

@@ -15,6 +15,7 @@ const users = {
 const products = {
     count: 'SELECT COUNT(*) FROM products',
     queryPrice: 'SELECT * FROM product_price_history WHERE product_id=? ORDER BY price_date DESC LIMIT 1',
+    queryPriceSequence: 'SELECT * FROM product_price_history WHERE product_id=? ORDER BY price_date DESC',
     queryImg: 'SELECT image_url FROM product_img WHERE product_id=?',
     queryName: 'SELECT name, image_url FROM product_name WHERE product_id=?',
     querySize: 'SELECT name FROM product_size WHERE product_id=?',
