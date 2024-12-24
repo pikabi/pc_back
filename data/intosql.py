@@ -233,7 +233,7 @@ def Tosql_price_tb():
                 cursor.execute("SELECT name FROM products WHERE platformID = %s and platform = %s", (id_value, platform))
                 result = cursor.fetchone()
                 name = result[0]
-                cursor.execute("SELECT user_id FROM user_product_favourite WHERE product_id = %s", (now))
+                cursor.execute("SELECT user_id FROM user_product_favourites WHERE product_id = %s", (now, ))
                 result = cursor.fetchall()
                 for user_id in result:
                     sql = 'INSERT INTO user_price_drop_alerts (user_id, product_name, product_url) VALUES (?, ?, ?)'
@@ -264,7 +264,6 @@ def Tosql_products_jd():
     for i, row in df.iterrows():
         # if i > 100:
         #     break
-        print(i)
         id_value = row['id']            
         platform = 'jd'
         cursor.execute("SELECT COUNT(*) FROM products WHERE platformID = %s and platform = %s", (id_value, platform))
